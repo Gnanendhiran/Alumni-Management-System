@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Student Directory - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Student Directory</h1>
+        <p>Connect with current students and potential candidates</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-bar">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search by name or student ID..."
+                    value="{{ search or '' }}" class="search-input">
+                <select name="degree" class="search-input">
+                    <option value="">All Degrees</option>
+                    {% for degree in degrees %}
+                    <option value="{{ degree.id }}" {% if degree_filter==degree.id|string %}selected{% endif %}>{{
+                        degree.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <!-- Students Grid -->
+        <div class="alumni-grid">
+            {% if students %}
+            {% for student in students %}
+            <div class="alumni-card">
+                <div class="alumni-photo">
+                    {% if student.profile_photo %}
+                    <img src="{{ url_for('static', filename=student.profile_photo) }}" alt="{{ student.first_name }}">
+                    {% else %}
+                    <span class="photo-placeholder">{{ student.first_name[0] if student.first_name else 'S' }}{{
+                        student.last_name[0] if student.last_name else '' }}</span>
+                    {% endif %}
+                </div>
+                <div class="alumni-info">
+                    <h3 class="alumni-name">
+                        <a href="{{ url_for('student_profile', profile_id=student.id) }}">{{ student.first_name }} {{
+                            student.last_name }}</a>
+                    </h3>
+                    {% if student.student_id %}
+                    <p class="alumni-title">ID: {{ student.student_id }}</p>
+                    {% endif %}
+                    <div class="alumni-meta">
+                        {% if student.degree_name %}
+                        <span>🎓 {{ student.degree_name }}</span>
+                        {% endif %}
+                        {% if student.expected_graduation %}
+                        <span>📅 Class of {{ student.expected_graduation }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <a href="{{ url_for('student_profile', profile_id=student.id) }}" class="btn btn-outline btn-sm">View
+                    Profile</a>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-results">
+                <p>No students found matching your criteria.</p>
+                {% if search or degree_filter %}
+                <a href="{{ url_for('student_directory') }}" class="btn btn-outline">Clear Filters</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

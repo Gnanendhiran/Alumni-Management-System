@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}New Announcement - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Post Announcement</h1>
+        <p>Share news and updates with the community</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <form method="POST" class="form-card">
+            <div class="form-group">
+                <label for="title">Title *</label>
+                <input type="text" id="title" name="title" required
+                    placeholder="e.g. Scholarship Opportunities Available">
+            </div>
+
+            <div class="form-group">
+                <label for="target_audience">Target Audience</label>
+                <select id="target_audience" name="target_audience" required>
+                    <option value="all">Everyone (Alumni & Students)</option>
+                    <option value="alumni_only">Alumni Only</option>
+                    <option value="students_only">Students Only</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Content *</label>
+                <textarea id="content" name="content" rows="8" required
+                    placeholder="Write your announcement here..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Post Announcement</button>
+                <a href="{{ url_for('announcements') }}" class="btn btn-outline btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

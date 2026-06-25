@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}About - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>{{ about.page_title or 'About Alumni Sync' }}</h1>
+        <p>{{ about.hero_subtitle or 'Connecting graduates, building futures' }}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <div class="about-content">
+            {% if about.main_content %}
+            <div class="content">{{ about.main_content }}</div>
+            {% else %}
+            <p>Welcome to Alumni Sync - your gateway to staying connected with your alma mater and fellow graduates.</p>
+
+            <h2>Our Mission</h2>
+            <p>Alumni Sync bridges the gap between current students and successful graduates, fostering a vibrant
+                community of mentorship, opportunity, and lifelong learning.</p>
+
+            <h2>What We Offer</h2>
+            <ul>
+                <li><strong>Networking:</strong> Connect with alumni across industries and geographies</li>
+                <li><strong>Job Opportunities:</strong> Access exclusive job postings from alumni-owned companies</li>
+                <li><strong>Events:</strong> Participate in reunions, workshops, and networking events</li>
+                <li><strong>Mentorship:</strong> Get guidance from experienced professionals in your field</li>
+            </ul>
+            {% endif %}
+        </div>
+
+        {% if institution %}
+        <div class="institution-info">
+            <h2>{{ institution.name }}</h2>
+            {% if institution.description %}
+            <p>{{ institution.description }}</p>
+            {% endif %}
+            <div class="contact-info">
+                {% if institution.address %}
+                <p>📍 {{ institution.address }}</p>
+                {% endif %}
+                {% if institution.email %}
+                <p>📧 {{ institution.email }}</p>
+                {% endif %}
+                {% if institution.phone %}
+                <p>📞 {{ institution.phone }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

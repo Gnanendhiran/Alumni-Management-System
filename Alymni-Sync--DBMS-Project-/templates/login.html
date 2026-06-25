@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue to Alumni Sync</p>
+            </div>
+
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            </div>
+        </div>
+
+        <div class="auth-side">
+            <div class="auth-side-content">
+                <h2>Stay Connected</h2>
+                <p>Access exclusive alumni benefits, job opportunities, and events.</p>
+                <ul class="benefits-list">
+                    <li>🔗 Connect with fellow alumni</li>
+                    <li>💼 Exclusive job postings</li>
+                    <li>📅 Event invitations</li>
+                    <li>🎓 Mentorship opportunities</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

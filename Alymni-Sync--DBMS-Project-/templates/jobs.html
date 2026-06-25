@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Job Board - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Job Board</h1>
+        <p>Find opportunities posted by alumni and partner companies</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-bar">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search jobs by title, company, or keyword..."
+                    value="{{ search or '' }}" class="search-input">
+                <select name="type" class="filter-select">
+                    <option value="">All Types</option>
+                    <option value="internship" {{ 'selected' if job_type=='internship' else '' }}>Internship</option>
+                    <option value="full_time" {{ 'selected' if job_type=='full_time' else '' }}>Full Time</option>
+                    <option value="part_time" {{ 'selected' if job_type=='part_time' else '' }}>Part Time</option>
+                    <option value="contract" {{ 'selected' if job_type=='contract' else '' }}>Contract</option>
+                    <option value="remote" {{ 'selected' if job_type=='remote' else '' }}>Remote</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <!-- Post Job Button (Alumni only) -->
+        {% if session.get('role') == 'alumni' %}
+        <div class="action-bar">
+            <a href="{{ url_for('create_job') }}" class="btn btn-success">+ Post a Job</a>
+        </div>
+        {% endif %}
+
+        <!-- Job Listings -->
+        <div class="jobs-list">
+            {% if jobs %}
+            {% for job in jobs %}
+            <div class="job-card-horizontal">
+                <div class="job-main">
+                    <div class="job-header">
+                        <h3 class="job-title">
+                            <a href="{{ url_for('job_detail', job_id=job.id) }}">{{ job.title }}</a>
+                        </h3>
+                        <div>
+                            <span class="badge badge-{{ job.job_type }}">{{ job.job_type.replace('_', ' ').title()
+                                }}</span>
+                            {% if job.target_audience == 'alumni_only' %}
+                            <span class="badge badge-alumni">👔 Alumni Only</span>
+                            {% elif job.target_audience == 'students_only' %}
+                            <span class="badge badge-students">🎓 Students Only</span>
+                            {% else %}
+                            <span class="badge badge-all">🌐 Open to All</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="job-company">{{ job.company_name }}</p>
+                    <div class="job-meta">
+                        <span>📍 {{ job.location or 'Remote' }}</span>
+                        {% if job.salary_min and job.salary_max %}
+                        <span>💰 {{ job.salary_currency or 'BDT' }} {{ job.salary_min|int }} - {{ job.salary_max|int
+                            }}</span>
+                        {% endif %}
+                        <span>📅 Posted {{ job.created_at | format_date('%b %d, %Y') if job.created_at else 'Recently'
+                            }}</span>
+                    </div>
+                    {% if job.description %}
+                    <p class="job-excerpt">{{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif
+                        %}</p>
+                    {% endif %}
+                </div>
+                <div class="job-actions">
+                    <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn btn-primary">View Details</a>
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-outline">Apply Now</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-results">
+                <p>No job postings found.</p>
+                {% if search or job_type %}
+                <a href="{{ url_for('jobs') }}" class="btn btn-outline">Clear Filters</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

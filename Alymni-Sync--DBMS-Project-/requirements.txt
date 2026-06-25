@@ -1,0 +1,6 @@
+# Alumni Sync - Backend & Frontend Application
+
+Flask
+mysql-connector-python
+python-dotenv
+Werkzeug

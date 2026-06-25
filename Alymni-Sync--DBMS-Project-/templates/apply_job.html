@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for {{ job.title }} - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <a href="{{ url_for('job_detail', job_id=job.id) }}" class="back-link">← Back to Job Details</a>
+        <h1>Apply for Position</h1>
+        <p>{{ job.title }} at {{ job.company_name }}</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <form method="POST" enctype="multipart/form-data" class="form-card">
+            <div class="form-group">
+                <label for="cv_file">Upload CV (PDF or DOC) *</label>
+                <input type="file" id="cv_file" name="cv_file" accept=".pdf,.doc,.docx" required>
+                <small class="form-help">Maximum file size: 16MB</small>
+            </div>
+
+            <div class="form-group">
+                <label for="cover_letter">Cover Letter</label>
+                <textarea id="cover_letter" name="cover_letter" rows="8"
+                    placeholder="Write a brief cover letter explaining why you're a good fit for this role..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="expected_salary">Expected Salary (BDT)</label>
+                <input type="number" id="expected_salary" name="expected_salary" placeholder="e.g. 20000">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                <a href="{{ url_for('jobs') }}" class="btn btn-outline btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

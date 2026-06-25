@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Alumni Sync{% endblock %}</title>
+    <meta name="description" content="Alumni Management System - Connecting graduates, building futures">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="nav-logo">
+                <span class="logo-icon">🎓</span>
+                <span class="logo-text">Alumni Sync</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
+                {% if session.get('user_id') %}
+                <li><a href="{{ url_for('alumni_directory') }}" class="nav-link">Alumni Directory</a></li>
+                <li><a href="{{ url_for('jobs') }}" class="nav-link">Jobs</a></li>
+                <li><a href="{{ url_for('events') }}" class="nav-link">Events</a></li>
+                <li><a href="{{ url_for('announcements') }}" class="nav-link">Announcements</a></li>
+                <li><a href="{{ url_for('messages_inbox') }}" class="nav-link">Messages</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('about') }}" class="nav-link">About</a></li>
+            </ul>
+
+            <div class="nav-auth">
+                {% if session.get('user_id') %}
+                <div class="dropdown" style="display:inline-block; position:relative;">
+                    <button class="btn btn-outline" id="user-menu-btn" onclick="toggleUserMenu()">My Account ▼</button>
+                    <div id="user-menu"
+                        style="display:none; position:absolute; right:0; top:100%; background:white; padding:10px; box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); min-width:180px; border-radius:0.375rem; z-index:1000; border: 1px solid #e5e7eb;">
+                        <a href="{{ url_for('dashboard') }}"
+                            style="display:block; padding:8px 12px; color:#1f2937; text-decoration:none; transition: background-color 0.2s;">Dashboard</a>
+                        <a href="{{ url_for('edit_profile') }}"
+                            style="display:block; padding:8px 12px; color:#1f2937; text-decoration:none; transition: background-color 0.2s;">Edit
+                            Profile</a>
+                        <hr style="margin:5px 0; border:0; border-top:1px solid #e5e7eb;">
+                        <a href="{{ url_for('logout') }}"
+                            style="display:block; padding:8px 12px; color:#1f2937; text-decoration:none; transition: background-color 0.2s;">Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-outline">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Join Now</a>
+                {% endif %}
+            </div>
+
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            {{ message }}
+            <button class="flash-close">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Alumni Sync</h3>
+                    <p>Connecting graduates, building futures. Stay connected with your alma mater and fellow alumni.
+                    </p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        {% if session.get('user_id') %}
+                        <li><a href="{{ url_for('alumni_directory') }}">Alumni Directory</a></li>
+                        <li><a href="{{ url_for('jobs') }}">Job Board</a></li>
+                        <li><a href="{{ url_for('events') }}">Events</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('register') }}">Join Now</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link">📘</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">💼</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Alumni Sync. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Flash message close functionality
+        document.querySelectorAll('.flash-close').forEach(btn => {
+            btn.addEventListener('click', () => btn.parentElement.remove());
+        });
+
+        // Mobile nav toggle
+        document.querySelector('.nav-toggle').addEventListener('click', () => {
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+
+        // User Menu Toggle
+        function toggleUserMenu() {
+            var menu = document.getElementById('user-menu');
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                menu.style.display = 'block';
+            }
+        }
+
+        // Close user menu when clicking outside
+        window.onclick = function (event) {
+            if (!event.target.matches('#user-menu-btn')) {
+                var menu = document.getElementById('user-menu');
+                if (menu && menu.style.display === 'block') {
+                    menu.style.display = 'none';
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Alumni Sync - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">Welcome to <span class="gradient-text">Alumni Sync</span></h1>
+        <p class="hero-subtitle">Connecting graduates, building futures. Your gateway to staying connected with your
+            alma mater and fellow alumni.</p>
+        <div class="hero-buttons">
+            {% if not session.user_id %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Join Now</a>
+            {% else %}
+            <a href="{{ url_for('alumni_directory') }}" class="btn btn-outline btn-lg">Explore Alumni</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.alumni_count or 0 }}+</span>
+            <span class="stat-label">Alumni Members</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.student_count or 0 }}+</span>
+            <span class="stat-label">Students</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.jobs_count or 0 }}</span>
+            <span class="stat-label">Open Jobs</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.events_count or 0 }}</span>
+            <span class="stat-label">Upcoming Events</span>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">What We Offer</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Alumni Network</h3>
+                <p>Connect with fellow graduates, find mentors, and expand your professional network.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💼</div>
+                <h3>Job Opportunities</h3>
+                <p>Exclusive job postings from alumni-owned companies and partner organizations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3>Events</h3>
+                <p>Reunions, workshops, and networking events to keep you engaged.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎓</div>
+                <h3>Student Support</h3>
+                <p>Alumni provide guidance, references, and internship opportunities to students.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Job Board Section -->
+<section class="section section-alt">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Latest Job Postings</h2>
+            <a href="{{ url_for('jobs') }}" class="btn btn-outline">View All Jobs</a>
+        </div>
+        <div class="jobs-grid">
+            {% if jobs %}
+            {% for job in jobs %}
+            <div class="job-card">
+                <div class="job-header">
+                    <h3 class="job-title">{{ job.title }}</h3>
+                    <span class="job-type badge badge-{{ job.job_type }}">{{ job.job_type }}</span>
+                </div>
+                <p class="job-company">{{ job.company_name }}</p>
+                <p class="job-location">📍 {{ job.location or 'Remote' }}</p>
+                <div class="job-footer">
+                    <span class="job-date">Posted {{ job.created_at | format_date('%b %d, %Y') if job.created_at else
+                        'Recently' }}</span>
+                    <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn btn-sm btn-primary">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="no-data">No job postings available at the moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Events Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Upcoming Events</h2>
+            <a href="{{ url_for('events') }}" class="btn btn-outline">View All Events</a>
+        </div>
+        <div class="events-grid">
+            {% if events %}
+            {% for event in events %}
+            <div class="event-card">
+                <div class="event-date-badge">
+                    <span class="month">{{ event.start_date | format_date('%b') if event.start_date else 'TBD' }}</span>
+                    <span class="day">{{ event.start_date | format_date('%d') if event.start_date else '--' }}</span>
+                </div>
+                <div class="event-details">
+                    <h3 class="event-title">{{ event.title }}</h3>
+                    <p class="event-venue">📍 {{ event.venue or 'Online' }}</p>
+                    {% if event.start_time %}
+                    <p class="event-time">🕐 {{ event.start_time | format_time('%I:%M %p') }}</p>
+                    {% endif %}
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-sm btn-outline">Learn
+                        More</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="no-data">No upcoming events at the moment.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Connect?</h2>
+        <p>Join our growing community of alumni and students today.</p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Join Now</a>
+    </div>
+</section>
+{% endblock %}

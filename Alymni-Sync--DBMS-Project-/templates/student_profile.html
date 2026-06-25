@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}{{ student.first_name }} {{ student.last_name }} - Student Profile{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <a href="{{ url_for('student_directory') }}" class="back-link">← Back to Directory</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="profile-layout">
+            <div class="profile-main">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-photo-large">
+                        {% if student.profile_photo %}
+                        <img src="{{ url_for('static', filename=student.profile_photo) }}"
+                            alt="{{ student.first_name }}">
+                        {% else %}
+                        <span class="photo-placeholder-large">{{ student.first_name[0] if student.first_name else 'S'
+                            }}{{
+                            student.last_name[0] if student.last_name else '' }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="profile-header-info">
+                        <h1>{{ student.first_name }} {{ student.last_name }}</h1>
+                        {% if student.student_id %}
+                        <p class="profile-title">Student ID: {{ student.student_id }}</p>
+                        {% endif %}
+                        <div class="profile-meta">
+                            {% if student.degree_name %}
+                            <span>🎓 {{ student.degree_name }}</span>
+                            {% endif %}
+                            {% if student.expected_graduation %}
+                            <span>📅 Expected Graduation: {{ student.expected_graduation }}</span>
+                            {% endif %}
+                            {% if student.campus_name %}
+                            <span>🏛️ {{ student.campus_name }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio Section -->
+                {% if student.bio %}
+                <div class="profile-section">
+                    <h3>About</h3>
+                    <p>{{ student.bio }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Contact Information -->
+                <div class="profile-section"
+                    style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                    <h4
+                        style="font-size: 0.875rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Contact Information</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        {% if student.email %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: var(--gray-500);">📧</span>
+                            <a href="mailto:{{ student.email }}"
+                                style="color: var(--primary-color); text-decoration: none;">{{ student.email }}</a>
+                        </div>
+                        {% endif %}
+                        {% if student.phone %}
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: var(--gray-500);">📱</span>
+                            <span style="color: var(--gray-700);">{{ student.phone }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <div class="sidebar-card">
+                    <h4>Profile Stats</h4>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ student.profile_views or 0 }}</span>
+                        <span class="stat-label">Profile Views</span>
+                    </div>
+                </div>
+
+                {% if student.user_id != session.get('user_id') %}
+                <div class="sidebar-card">
+                    <h4>Connect</h4>
+                    <a href="{{ url_for('compose_message', recipient_id=student.user_id) }}"
+                        class="btn btn-primary btn-block">Send Message</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

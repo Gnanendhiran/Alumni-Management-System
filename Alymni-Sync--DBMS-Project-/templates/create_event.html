@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Create Event - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Create Event</h1>
+        <p>Host an event for the alumni community</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <form method="POST" class="form-card">
+            <div class="form-group">
+                <label for="title">Event Title *</label>
+                <input type="text" id="title" name="title" required placeholder="e.g. Annual Alumni Reunion 2026">
+            </div>
+
+            <div class="form-group">
+                <label for="visibility">Target Audience</label>
+                <select id="visibility" name="visibility" required>
+                    <option value="all">Everyone (Alumni & Students)</option>
+                    <option value="alumni_only">Alumni Only</option>
+                    <option value="students_only">Students Only</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_date">Start Date *</label>
+                    <input type="date" id="start_date" name="start_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_time">Start Time *</label>
+                    <input type="time" id="start_time" name="start_time" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date">
+                </div>
+                <div class="form-group">
+                    <label for="end_time">End Time</label>
+                    <input type="time" id="end_time" name="end_time">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="venue">Venue/Location *</label>
+                    <input type="text" id="venue" name="venue" required placeholder="e.g. Main Auditorium or Zoom Link">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" rows="6" required
+                    placeholder="Describe the event details..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Publish Event</button>
+                <a href="{{ url_for('events') }}" class="btn btn-outline btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
