@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <a href="{{ url_for('events') }}" class="back-link">← Back to Events</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="event-detail-layout">
+            <div class="event-detail-main">
+                {% if event.cover_image %}
+                <img src="{{ url_for('static', filename=event.cover_image) }}" class="event-cover"
+                    alt="{{ event.title }}">
+                {% endif %}
+
+                <h1 class="event-title">{{ event.title }}</h1>
+                <div style="margin-bottom: 1rem;">
+                    {% if event.visibility == 'alumni_only' %}
+                    <span class="badge badge-alumni badge-lg">👔 Alumni Only</span>
+                    {% elif event.visibility == 'students_only' %}
+                    <span class="badge badge-students badge-lg">🎓 Students Only</span>
+                    {% else %}
+                    <span class="badge badge-all badge-lg">🌐 Open to All</span>
+                    {% endif %}
+                </div>
+
+                <div class="event-detail-meta"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; padding: 1.5rem; background: var(--gray-50); border-radius: 8px;">
+                    <div class="meta-item" style="display: flex; gap: 0.75rem;">
+                        <span class="meta-icon" style="font-size: 1.5rem;">📅</span>
+                        <div>
+                            <strong
+                                style="display: block; margin-bottom: 0.25rem; color: var(--gray-700);">Date</strong>
+                            <p style="margin: 0; color: var(--gray-900);">{{ event.start_date | format_date('%A, %B %d,
+                                %Y') if event.start_date else 'TBD' }}</p>
+                            {% if event.end_date and event.end_date != event.start_date %}
+                            <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem;">to {{ event.end_date |
+                                format_date('%B %d, %Y') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if event.start_time %}
+                    <div class="meta-item" style="display: flex; gap: 0.75rem;">
+                        <span class="meta-icon" style="font-size: 1.5rem;">🕐</span>
+                        <div>
+                            <strong
+                                style="display: block; margin-bottom: 0.25rem; color: var(--gray-700);">Time</strong>
+                            <p style="margin: 0; color: var(--gray-900);">{{ event.start_time | format_time('%I:%M %p')
+                                }}</p>
+                            {% if event.end_time %}
+                            <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem;">to {{ event.end_time |
+                                format_time('%I:%M %p') }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="meta-item" style="display: flex; gap: 0.75rem;">
+                        <span class="meta-icon" style="font-size: 1.5rem;">📍</span>
+                        <div>
+                            <strong
+                                style="display: block; margin-bottom: 0.25rem; color: var(--gray-700);">Venue</strong>
+                            <p style="margin: 0; color: var(--gray-900);">{{ event.venue or 'Online Event' }}</p>
+                            {% if event.venue_address %}
+                            <p style="margin: 0; color: var(--gray-600); font-size: 0.875rem;">{{ event.venue_address }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if event.description %}
+                <div class="event-detail-section">
+                    <h3>About This Event</h3>
+                    <div class="content">{{ event.description }}</div>
+                </div>
+                {% endif %}
+
+                {% if is_creator and registrants %}
+                <div class="event-detail-section">
+                    <h3 class="table-section-title">👥 Registered Attendees ({{ registrants|length }})</h3>
+                    <div class="registrants-list">
+                        <table style="width:100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr>
+                                    <th style="padding:10px; text-align:left;">Name</th>
+                                    <th style="padding:10px; text-align:left;">Email</th>
+                                    <th style="padding:10px; text-align:left;">Registered On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in registrants %}
+                                <tr style="border-bottom:1px solid var(--gray-200);">
+                                    <td style="padding:10px;">
+                                        {% if reg.profile_id and reg.profile_type %}
+                                        <a href="{% if reg.profile_type == 'alumni' %}{{ url_for('alumni_profile', profile_id=reg.profile_id) }}{% else %}{{ url_for('student_profile', profile_id=reg.profile_id) }}{% endif %}"
+                                            style="color: var(--primary-color); text-decoration: none; font-weight: 500;">
+                                            {{ reg.first_name }} {{ reg.last_name }}
+                                        </a>
+                                        {% else %}
+                                        {{ reg.first_name }} {{ reg.last_name }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding:10px;"><a href="mailto:{{ reg.email }}">{{ reg.email }}</a></td>
+                                    <td style="padding:10px;">{{ reg.created_at | format_date('%b %d, %Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if event.is_online and event.online_link %}
+                <div class="event-detail-section">
+                    <h3>Join Online</h3>
+                    <a href="{{ event.online_link }}" class="btn btn-outline" target="_blank">Join Meeting</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="event-detail-sidebar">
+                <div class="sidebar-card">
+                    <h4>Registration</h4>
+                    <p class="stat-large">{{ event.registrations or 0 }}{% if event.max_attendees %}/{{
+                        event.max_attendees }}{% endif %}</p>
+                    <p class="stat-label">people registered</p>
+
+                    {% if event.is_registration_required %}
+                    {% if is_registered %}
+                    <p class="success-message">✓ You are registered!</p>
+                    {% elif session.get('user_id') %}
+                    <form method="POST" action="{{ url_for('register_event', event_id=event.id) }}">
+                        <button type="submit" class="btn btn-primary btn-block">Register Now</button>
+                    </form>
+                    {% else %}
+                    <p class="note">Please <a href="{{ url_for('login') }}">login</a> to register.</p>
+                    {% endif %}
+                    {% else %}
+                    <p class="note">No registration required</p>
+                    {% endif %}
+
+                    {% if event.registration_deadline %}
+                    <p class="deadline">Registration closes: {{ event.registration_deadline | format_date('%B %d, %Y')
+                        }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="sidebar-card">
+                    <h4>Share Event</h4>
+                    <div class="share-buttons">
+                        <button class="btn btn-outline btn-sm"
+                            onclick="navigator.clipboard.writeText(window.location.href)">📋 Copy Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

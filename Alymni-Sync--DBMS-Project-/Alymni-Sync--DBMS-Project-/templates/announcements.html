@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Announcements</h1>
+                <p>Stay updated with the latest news and updates</p>
+            </div>
+            {% if session.get('role') == 'alumni' %}
+            <a href="{{ url_for('create_announcement') }}" class="btn btn-primary">Post Announcement</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <div class="announcements-list">
+            {% if announcements %}
+            {% for announcement in announcements %}
+            <div
+                class="announcement-card {% if announcement.is_pinned %}pinned{% endif %} priority-{{ announcement.priority }}">
+                {% if announcement.is_pinned %}
+                <span class="pinned-badge">📌 Pinned</span>
+                {% endif %}
+                <div class="announcement-header">
+                    <h3>{{ announcement.title }}</h3>
+                    <span class="badge badge-{{ announcement.priority }}">{{ announcement.priority.title() }}</span>
+                </div>
+                <div class="announcement-content">
+                    {{ announcement.content }}
+                </div>
+                <div class="announcement-footer">
+                    <span class="date">{{ announcement.created_at | format_date('%B %d, %Y') if announcement.created_at
+                        else
+                        '' }}</span>
+
+                    {% if announcement.author_name %}
+                    <div class="author-info"
+                        style="margin-left: auto; text-align: right; font-size: 0.85rem; color: var(--gray-600);">
+                        <strong>{{ announcement.author_name }}</strong>
+                        {% if announcement.author_company %}
+                        <br><span class="author-company">{{ announcement.author_company }}</span>
+                        {% endif %}
+                        <div class="author-contact" style="font-size: 0.8rem; margin-top: 2px;">
+                            <a href="mailto:{{ announcement.author_email }}" style="color: var(--primary-color);">{{
+                                announcement.author_email }}</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-results">
+                <p>No announcements at the moment. Check back later!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

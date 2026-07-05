@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Create Job Posting - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Post a New Job</h1>
+        <p>Share job opportunities with students and fellow alumni</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <form method="POST" class="form-card">
+            <div class="form-group">
+                <label for="title">Job Title *</label>
+                <input type="text" id="title" name="title" required placeholder="e.g. Software Engineer Intern">
+            </div>
+
+            <div class="form-group">
+                <label for="company_name">Company Name *</label>
+                <input type="text" id="company_name" name="company_name" required placeholder="e.g. Tech Solutions Ltd">
+            </div>
+
+            <div class="form-group">
+                <label for="target_audience">Target Audience</label>
+                <select id="target_audience" name="target_audience" required>
+                    <option value="all">Everyone (Alumni & Students)</option>
+                    <option value="alumni_only">Alumni Only</option>
+                    <option value="students_only">Students Only</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="job_type">Job Type *</label>
+                    <select id="job_type" name="job_type" required>
+                        <option value="">Select type</option>
+                        <option value="internship">Internship</option>
+                        <option value="full_time">Full Time</option>
+                        <option value="part_time">Part Time</option>
+                        <option value="contract">Contract</option>
+                        <option value="remote">Remote</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" name="location" placeholder="e.g. Dhaka, Bangladesh">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Job Description *</label>
+                <textarea id="description" name="description" rows="6" required
+                    placeholder="Describe the role, responsibilities, and what you're looking for..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="requirements">Requirements</label>
+                <textarea id="requirements" name="requirements" rows="4"
+                    placeholder="List the required qualifications, skills, and experience..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="salary_min">Salary Range (Min)</label>
+                    <input type="number" id="salary_min" name="salary_min" placeholder="e.g. 15000">
+                </div>
+                <div class="form-group">
+                    <label for="salary_max">Salary Range (Max)</label>
+                    <input type="number" id="salary_max" name="salary_max" placeholder="e.g. 25000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="deadline">Application Deadline</label>
+                <input type="date" id="deadline" name="deadline">
+            </div>
+
+            <div class="form-group">
+                <label for="vacancies">Number of Vacancies</label>
+                <input type="number" id="vacancies" name="vacancies" min="1" value="1" placeholder="e.g. 3">
+                <small>How many positions are available?</small>
+            </div>
+
+            <div class="form-group">
+                <label for="skills">Required Skills (comma separated)</label>
+                <input type="text" id="skills" name="skills" placeholder="e.g. Python, JavaScript, SQL, Communication">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Post Job</button>
+                <a href="{{ url_for('jobs') }}" class="btn btn-outline btn-lg">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Social Feed - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Social Feed</h1>
+        <p>Interact with peers, share updates, and stay connected with the community</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="feed-layout">
+            
+            <!-- Left Side: Main Feed -->
+            <div class="feed-main">
+                
+                <!-- Create Post Box -->
+                <div class="create-post-card">
+                    <h3>💬 Share an Update</h3>
+                    <form action="{{ url_for('create_post') }}" method="POST" class="create-post-form">
+                        <textarea name="content" placeholder="What's on your mind? Share announcements, opportunities, or insights..." required></textarea>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Post Update</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Timeline Posts -->
+                <div class="posts-timeline" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    {% if posts %}
+                        {% for post in posts %}
+                            <div class="post-card {% if post.is_pinned %}pinned{% endif %}">
+                                <!-- Post Header -->
+                                <div class="post-header">
+                                    <div class="post-avatar">
+                                        {% if post.profile_photo %}
+                                            <img src="{{ url_for('static', filename=post.profile_photo) }}" alt="{{ post.first_name }}">
+                                        {% else %}
+                                            <div class="avatar-placeholder">
+                                                {{ post.first_name[0] if post.first_name else 'U' }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="post-author-info">
+                                        {% if post.author_role == 'alumni' %}
+                                            <a href="{{ url_for('alumni_profile', profile_id=post.author_profile_id) }}" class="post-author-name">
+                                                {{ post.first_name }} {{ post.last_name }}
+                                            </a>
+                                            <span class="post-author-title">👔 Alumni</span>
+                                        {% else %}
+                                            <a href="{{ url_for('student_profile', profile_id=post.author_profile_id) }}" class="post-author-name">
+                                                {{ post.first_name }} {{ post.last_name }}
+                                            </a>
+                                            <span class="post-author-title">🎓 Student</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="post-time">
+                                        {{ post.created_at | format_date('%B %d, %Y at %I:%M %p') }}
+                                    </div>
+                                </div>
+                                
+                                <!-- Post Content -->
+                                <div class="post-content">{{ post.content }}</div>
+                                
+                                <!-- Post Actions -->
+                                <div class="post-actions">
+                                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="post-action-btn {% if post.user_has_liked %}liked{% endif %}">
+                                            👍 {{ 'Liked' if post.user_has_liked else 'Like' }} ({{ post.likes_count }})
+                                        </button>
+                                    </form>
+                                    <button class="post-action-btn" onclick="toggleComments({{ post.id }})">
+                                        💬 Comments ({{ post.comments_count }})
+                                    </button>
+                                </div>
+                                
+                                <!-- Comments Section -->
+                                <div class="comments-section" id="comments-{{ post.id }}" style="display: none;">
+                                    <div class="comment-list">
+                                        {% if post.comments %}
+                                            {% for comment in post.comments %}
+                                                <div class="comment-item">
+                                                    <div class="comment-avatar">
+                                                        {% if comment.profile_photo %}
+                                                            <img src="{{ url_for('static', filename=comment.profile_photo) }}" alt="{{ comment.first_name }}">
+                                                        {% else %}
+                                                            <div class="avatar-placeholder" style="font-size: 0.8rem;">
+                                                                {{ comment.first_name[0] if comment.first_name else 'U' }}
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="comment-content">
+                                                        <div>
+                                                            {% if comment.author_role == 'alumni' %}
+                                                                <a href="{{ url_for('alumni_profile', profile_id=comment.author_profile_id) }}" class="comment-author-name">
+                                                                    {{ comment.first_name }} {{ comment.last_name }}
+                                                                </a>
+                                                            {% else %}
+                                                                <a href="{{ url_for('student_profile', profile_id=comment.author_profile_id) }}" class="comment-author-name">
+                                                                    {{ comment.first_name }} {{ comment.last_name }}
+                                                                </a>
+                                                            {% endif %}
+                                                            <span style="font-size: 0.75rem; color: var(--gray-500); margin-left: 0.5rem;">
+                                                                {{ comment.created_at | format_date('%b %d, %H:%M') }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="comment-text">{{ comment.content }}</div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="no-data" style="padding: 1rem; font-size: 0.875rem;">No comments yet. Be the first to comment!</p>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Comment Form -->
+                                    <div class="comment-form-container">
+                                        <form action="{{ url_for('comment_post', post_id=post.id) }}" method="POST" class="comment-form">
+                                            <input type="text" name="content" placeholder="Write a comment..." required autocomplete="off">
+                                            <button type="submit" class="btn btn-primary">Comment</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-results" style="background: var(--dark-surface); border: 1px solid var(--dark-border); border-radius: var(--radius);">
+                            <p>No posts in the feed yet. Start the conversation!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right Side: Sidebar User Details & Navigation -->
+            <div class="feed-sidebar">
+                <div class="sidebar-user-card">
+                    <div class="sidebar-user-avatar">
+                        {% if user_profile.profile_photo %}
+                            <img src="{{ url_for('static', filename=user_profile.profile_photo) }}" alt="{{ user_profile.first_name }}">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                {{ user_profile.first_name[0] if user_profile.first_name else 'U' }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h3 class="sidebar-user-name">{{ user_profile.first_name }} {{ user_profile.last_name }}</h3>
+                    <span class="sidebar-user-role">{{ session.get('role') }}</span>
+                    
+                    <div class="feed-stats">
+                        <div class="feed-stat-item">
+                            <span class="feed-stat-value">{{ sidebar_stats.posts }}</span>
+                            <span class="feed-stat-label">Posts</span>
+                        </div>
+                        <div class="feed-stat-item">
+                            <span class="feed-stat-value">{{ sidebar_stats.followers }}</span>
+                            <span class="feed-stat-label">Followers</span>
+                        </div>
+                        <div class="feed-stat-item">
+                            <span class="feed-stat-value">{{ sidebar_stats.following }}</span>
+                            <span class="feed-stat-label">Following</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card" style="background: var(--dark-surface); border: 1px solid var(--dark-border); border-radius: var(--radius); padding: 1.5rem;">
+                    <h4>💡 Quick Tips</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-top: 0.5rem;">
+                        Keep the feed professional! Share job updates, institutional events, study tips, or mentorship guidance.
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<script>
+    function toggleComments(postId) {
+        const commentsDiv = document.getElementById(`comments-${postId}`);
+        if (commentsDiv.style.display === 'none') {
+            commentsDiv.style.display = 'flex';
+        } else {
+            commentsDiv.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

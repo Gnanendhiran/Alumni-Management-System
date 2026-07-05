@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Edit Your Profile</h1>
+        <p>Keep your information up to date</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container container-narrow">
+        <form method="POST" enctype="multipart/form-data" class="form-card">
+            <div class="form-section">
+                <h3>Profile Photo</h3>
+                <div class="photo-upload">
+                    {% if profile.profile_photo %}
+                    <img src="{{ url_for('static', filename=profile.profile_photo) }}" alt="Profile"
+                        class="current-photo">
+                    {% endif %}
+                    <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                    <small class="form-help">Upload a new photo (JPG, PNG, max 5MB)</small>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Personal Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name *</label>
+                        <input type="text" id="first_name" name="first_name" required
+                            value="{{ profile.first_name or '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name *</label>
+                        <input type="text" id="last_name" name="last_name" required
+                            value="{{ profile.last_name or '' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{{ profile.phone or '' }}"
+                        placeholder="+880 1XXX XXXXXX">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date_of_birth">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth"
+                            value="{{ profile.date_of_birth or '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="male" {% if profile.gender=='male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if profile.gender=='female' %}selected{% endif %}>Female</option>
+                            <option value="other" {% if profile.gender=='other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="nationality">Nationality</label>
+                    <input type="text" id="nationality" name="nationality" value="{{ profile.nationality or '' }}"
+                        placeholder="e.g. Bangladeshi">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Social Links</h3>
+                <div class="form-group">
+                    <label for="linkedin_url">LinkedIn Profile URL</label>
+                    <input type="url" id="linkedin_url" name="linkedin_url" value="{{ profile.linkedin_url or '' }}"
+                        placeholder="https://linkedin.com/in/yourprofile">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>About You</h3>
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" rows="5"
+                        placeholder="Tell us about yourself, your studies, and career goals...">{{ profile.bio or '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline btn-lg">Cancel</a>
+            </div>
+        </form>
+
+        <div class="form-card" style="margin-top: 2rem; border-left: 4px solid #dc3545;">
+            <div class="form-section">
+                <h3 style="color: #dc3545;">Delete Account</h3>
+                <p>Permanently remove your account and all associated data. This action cannot be undone.</p>
+                <form action="{{ url_for('delete_account') }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone.');">
+                    <button type="submit" class="btn"
+                        style="background-color: #dc3545; color: white; border: none; padding: 0.5rem 1.5rem;">Delete
+                        Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

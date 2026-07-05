@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="dashboard-header">
+    <div class="container">
+        <div class="welcome-section">
+            <div class="user-avatar">
+                {% if profile.profile_photo %}
+                <img src="{{ url_for('static', filename=profile.profile_photo) }}" alt="Profile">
+                {% else %}
+                <span class="avatar-placeholder">{{ profile.first_name[0] if profile.first_name else 'S' }}</span>
+                {% endif %}
+            </div>
+            <div class="welcome-text">
+                <h1>Welcome back, {{ profile.first_name or 'Student' }}!</h1>
+                <p>Student ID: {{ profile.student_id or 'Not set' }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="dashboard-grid">
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <h3>Quick Actions</h3>
+                <div class="quick-actions">
+                    <a href="{{ url_for('edit_profile') }}" class="action-item">
+                        <span class="action-icon">📝</span>
+                        <span>Edit Profile</span>
+                    </a>
+                    <a href="{{ url_for('jobs') }}" class="action-item">
+                        <span class="action-icon">💼</span>
+                        <span>Find Jobs</span>
+                    </a>
+                    <a href="{{ url_for('events') }}" class="action-item">
+                        <span class="action-icon">📅</span>
+                        <span>View Events</span>
+                    </a>
+                    <a href="{{ url_for('alumni_directory') }}" class="action-item">
+                        <span class="action-icon">👥</span>
+                        <span>Connect with Alumni</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Stats -->
+            <div class="dashboard-card profile-summary-card">
+                <h3>Your Profile</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number">{{ profile.profile_views or 0 }}</span>
+                        <span class="stat-label">Profile Views</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">{{ applications|length if applications else 0 }}</span>
+                        <span class="stat-label">Applications</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-outline btn-sm">Complete Your Profile</a>
+            </div>
+
+            <!-- My Applications -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h3>My Job Applications</h3>
+                    <a href="{{ url_for('jobs') }}" class="btn btn-primary btn-sm">Find Jobs</a>
+                </div>
+                {% if applications %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Applied On</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in applications %}
+                            <tr>
+                                <td>{{ app.title }}</td>
+                                <td>{{ app.company_name }}</td>
+                                <td>{{ app.application_date | format_date('%b %d, %Y') if app.application_date else
+                                    'N/A' }}
+                                </td>
+                                <td><span class="badge badge-{{ app.status }}">{{ app.status.title() }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('job_detail', job_id=app.job_posting_id) }}"
+                                        class="btn btn-sm btn-outline">View Job</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="no-data">You haven't applied to any jobs yet. <a href="{{ url_for('jobs') }}">Browse available
+                        positions</a></p>
+                {% endif %}
+            </div>
+
+            <!-- My Registered Events -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h3>My Registered Events</h3>
+                    <a href="{{ url_for('events') }}" class="btn btn-primary btn-sm">Browse Events</a>
+                </div>
+                {% if my_events %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Venue</th>
+                                <th>Registration Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in my_events %}
+                            <tr>
+                                <td>{{ event.title }}</td>
+                                <td>{{ event.start_date | format_date('%b %d, %Y') if event.start_date else 'TBD' }}
+                                </td>
+                                <td>{{ event.venue or 'Online' }}</td>
+                                <td><span class="badge badge-{{ event.registration_status }}">{{
+                                        event.registration_status.title() }}</span></td>
+                                <td>
+                                    <a href="{{ url_for('event_detail', event_id=event.id) }}"
+                                        class="btn btn-sm btn-outline">View Details</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="no-data">You haven't registered for any events yet. <a href="{{ url_for('events') }}">Browse
+                        upcoming events</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
