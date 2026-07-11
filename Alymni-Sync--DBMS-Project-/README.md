@@ -1,9 +1,6 @@
 # 🎓 Alumni Sync - Alumni Management System
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
-[![Flask Version](https://img.shields.io/badge/flask-3.0%2B-green.svg)](https://flask.palletsprojects.com/)
-[![MySQL Database](https://img.shields.io/badge/mysql-8.0%2B-blue.svg)](https://www.mysql.com/)
-[![License](https://img.shields.io/badge/license-MIT-red.svg)](LICENSE)
+
 
 Alumni Sync is a comprehensive, production-ready, full-stack **Alumni Management System** designed to bridge the gap between university students, alumni, and administrators. Built with a robust **Flask (Python)** backend, **Jinja2** templates, and a normalized **MySQL** database, it showcases advanced database design principles and relational architectures.
 
