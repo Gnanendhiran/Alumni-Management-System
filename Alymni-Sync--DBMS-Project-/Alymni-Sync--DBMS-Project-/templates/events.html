@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Events - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Upcoming Events</h1>
+                <p>Stay connected through reunions, workshops, and networking events</p>
+            </div>
+            {% if session.get('role') == 'alumni' %}
+            <a href="{{ url_for('create_event') }}" class="btn btn-primary">Create Event</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="events-list">
+            {% if events %}
+            {% for event in events %}
+            <div class="event-card-horizontal">
+                <div class="event-date-badge large">
+                    <span class="month">{{ event.start_date | format_date('%b') if event.start_date else 'TBD' }}</span>
+                    <span class="day">{{ event.start_date | format_date('%d') if event.start_date else '--' }}</span>
+                    <span class="year">{{ event.start_date | format_date('%Y') if event.start_date else '' }}</span>
+                </div>
+                <div class="event-content">
+                    <div class="event-header">
+                        <h3 class="event-title">
+                            <a href="{{ url_for('event_detail', event_id=event.id) }}">{{ event.title }}</a>
+                        </h3>
+                        <div>
+                            {% if event.is_online %}
+                            <span class="badge badge-online">Online Event</span>
+                            {% endif %}
+
+                            {% if event.visibility == 'alumni_only' %}
+                            <span class="badge badge-alumni">👔 Alumni Only</span>
+                            {% elif event.visibility == 'students_only' %}
+                            <span class="badge badge-students">🎓 Students Only</span>
+                            {% else %}
+                            <span class="badge badge-all">🌐 Open to All</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if event.short_description %}
+                    <p class="event-description">{{ event.short_description }}</p>
+                    {% endif %}
+                    <div class="event-meta">
+                        <span>📅 {{ event.start_date | format_date('%B %d, %Y') if event.start_date else 'TBD' }}</span>
+                        {% if event.start_time %}
+                        <span>🕐 {{ event.start_time | format_time('%I:%M %p') if event.start_time else '' }}{% if
+                            event.end_time %} - {{ event.end_time | format_time('%I:%M %p') }}{% endif %}</span>
+                        {% endif %}
+                        <span>📍 {{ event.venue or 'Online' }}</span>
+                        <span>👥 {{ event.registrations or 0 }} registered</span>
+                    </div>
+                </div>
+                <div class="event-actions">
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-results">
+                <p>No upcoming events at the moment. Check back soon!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
