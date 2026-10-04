@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Conversation - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <a href="{{ url_for('messages_inbox') }}" class="back-link">← Back to Messages</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="conversation-container" style="max-width: 800px; margin: 0 auto;">
+            <div class="conversation-header"
+                style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 2rem;">
+                <div>
+                    <h1 style="margin: 0 0 0.5rem 0;">Conversation with {{ conversation.other_user_name }}</h1>
+                    <a href="{{ url_for('messages_inbox') }}"
+                        style="font-size: 0.875rem; color: var(--primary-color); text-decoration: none;">← Back to
+                        Messages</a>
+                </div>
+            </div>
+
+            <!-- Messages List -->
+            <div class="messages-list"
+                style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; max-height: 500px; overflow-y: auto; padding: 1rem;">
+                {% for msg in messages %}
+                <div class="message {% if msg.sender_id == session.get('user_id') %}message-sent{% else %}message-received{% endif %}"
+                    style="display: flex; flex-direction: column; {% if msg.sender_id == session.get('user_id') %}align-items: flex-end;{% else %}align-items: flex-start;{% endif %}">
+                    <div class="message-bubble"
+                        style="max-width: 70%; padding: 0.75rem 1rem; border-radius: 12px; {% if msg.sender_id == session.get('user_id') %}background: var(--primary-color); color: white;{% else %}background: var(--gray-100); color: var(--gray-900);{% endif %}">
+                        <p style="margin: 0;">{{ msg.content }}</p>
+                    </div>
+                    <span class="message-time"
+                        style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;">{{ msg.created_at |
+                        format_date('%b %d, %I:%M %p') }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Reply Form -->
+            <div class="reply-form" style="border-top: 2px solid var(--gray-200); padding-top: 1.5rem;">
+                <form method="POST" action="{{ url_for('compose_message', recipient_id=conversation.other_user_id) }}">
+                    <div class="form-group">
+                        <label for="message">Reply</label>
+                        <textarea id="message" name="message" rows="4" required
+                            placeholder="Type your reply..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Reply</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Scroll to bottom of messages on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        var messagesList = document.querySelector('.messages-list');
+        if (messagesList) {
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+    });
+</script>
+{% endblock %}

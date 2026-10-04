@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Messages - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Messages</h1>
+        <p>Your conversations</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <!-- Action buttons for browsing users -->
+        <div style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <a href="{{ url_for('alumni_directory') }}" class="btn btn-outline btn-sm">Browse Alumni</a>
+            <a href="{{ url_for('student_directory') }}" class="btn btn-outline btn-sm">Browse Students</a>
+        </div>
+
+        <div class="messages-container">
+            {% if conversations %}
+            <div class="conversations-list">
+                {% for conv in conversations %}
+                <a href="{{ url_for('view_conversation', conversation_id=conv.id) }}" class="conversation-item">
+                    <div class="conversation-photo">
+                        {% if conv.other_user_photo %}
+                        <img src="{{ url_for('static', filename=conv.other_user_photo) }}"
+                            alt="{{ conv.other_user_name }}">
+                        {% else %}
+                        <span class="photo-placeholder-sm">{{ conv.other_user_name[0] if conv.other_user_name else '?'
+                            }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="conversation-info">
+                        <h3>{{ conv.other_user_name }}</h3>
+                        <p class="last-message">{{ conv.last_message[:60] if conv.last_message else 'No messages yet'
+                            }}{% if conv.last_message and conv.last_message|length > 60 %}...{% endif %}</p>
+                        {% if conv.last_message_at %}
+                        <span class="conversation-time">{{ conv.last_message_at | format_date('%b %d, %I:%M %p')
+                            }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <h2>📭 No Messages Yet</h2>
+                <p>Start a conversation by visiting someone's profile and clicking "Send Message".</p>
+                <div style="margin-top: 1.5rem;">
+                    <a href="{{ url_for('alumni_directory') }}" class="btn btn-primary">Browse Alumni</a>
+                    <a href="{{ url_for('student_directory') }}" class="btn btn-outline">Browse Students</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

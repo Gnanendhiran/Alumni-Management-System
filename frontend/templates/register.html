@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-container">
+        <div class="auth-card auth-card-wide">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join the Alumni Sync community</p>
+            </div>
+
+            <form method="POST" class="auth-form" id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" id="first_name" name="first_name" required placeholder="Enter first name">
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" required placeholder="Enter last name">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Enter phone number">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_id">Student ID</label>
+                        <input type="text" id="student_id" name="student_id" required
+                            placeholder="Student ID / Alumni Verification ID">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>I am registering as:</label>
+                    <div class="radio-group" id="userTypeSelection">
+                        <label class="radio-option">
+                            <input type="radio" name="user_type" value="alumni" required>
+                            <span class="radio-label">
+                                <strong>Alumni</strong>
+                                <small>I have graduated</small>
+                            </span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="user_type" value="student" required>
+                            <span class="radio-label">
+                                <strong>Student</strong>
+                                <small>I am currently enrolled</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Fields that differ based on role -->
+                <div id="dynamic-fields">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="degree_id">Degree Program</label>
+                            <select id="degree_id" name="degree_id" required>
+                                <option value="">Select Degree</option>
+                                {% for degree in degrees %}
+                                <option value="{{ degree.id }}">{{ degree.name }} ({{ degree.level|capitalize }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="campus_id">Campus</label>
+                            <select id="campus_id" name="campus_id" required>
+                                <option value="">Select Campus</option>
+                                {% for campus in campuses %}
+                                <option value="{{ campus.id }}">{{ campus.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Alumni Specific -->
+                    <div class="form-group role-specific" id="alumni-fields" style="display: none;">
+                        <label for="graduation_year">Graduation Year</label>
+                        <input type="number" id="graduation_year" name="graduation_year" min="1990" max="2030" placeholder="YYYY">
+                    </div>
+
+                    <!-- Student Specific -->
+                    <div class="form-row role-specific" id="student-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="expected_graduation_year">Expected Graduation Year</label>
+                            <input type="number" id="expected_graduation_year" name="expected_graduation_year" min="2020" max="2035" placeholder="YYYY">
+                        </div>
+                        <div class="form-group">
+                            <label for="current_semester">Current Semester</label>
+                            <input type="text" id="current_semester" name="current_semester" placeholder="e.g. Fall 2025">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Create a password"
+                            minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required
+                            placeholder="Confirm password">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox">
+                        <input type="checkbox" required>
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+            </form>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const userTypeRadios = document.querySelectorAll('input[name="user_type"]');
+                    const alumniFields = document.getElementById('alumni-fields');
+                    const studentFields = document.getElementById('student-fields');
+                    const gradYearInput = document.getElementById('graduation_year');
+                    const expGradYearInput = document.getElementById('expected_graduation_year');
+                    const currentSemesterInput = document.getElementById('current_semester');
+
+                    function toggleFields() {
+                        const selectedType = document.querySelector('input[name="user_type"]:checked')?.value;
+                        
+                        if (selectedType === 'alumni') {
+                            alumniFields.style.display = 'block';
+                            studentFields.style.display = 'none';
+                            gradYearInput.setAttribute('required', 'required');
+                            expGradYearInput.removeAttribute('required');
+                            currentSemesterInput.removeAttribute('required');
+                        } else if (selectedType === 'student') {
+                            alumniFields.style.display = 'none';
+                            studentFields.style.display = 'flex'; // It's a form-row
+                            gradYearInput.removeAttribute('required');
+                            expGradYearInput.setAttribute('required', 'required');
+                            currentSemesterInput.setAttribute('required', 'required');
+                        }
+                    }
+
+                    userTypeRadios.forEach(radio => {
+                        radio.addEventListener('change', toggleFields);
+                    });
+                    
+                    // Run once on load
+                    toggleFields();
+                });
+            </script>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

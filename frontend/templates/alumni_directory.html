@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Alumni Directory - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>Alumni Directory</h1>
+        <p>Connect with fellow graduates from your alma mater</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-bar">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" placeholder="Search by name, company, or job title..."
+                    value="{{ search or '' }}" class="search-input">
+                <input type="text" name="skill" placeholder="Filter by skill..." value="{{ skill or '' }}"
+                    class="search-input">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <!-- Alumni Grid -->
+        <div class="alumni-grid">
+            {% if alumni %}
+            {% for person in alumni %}
+            <div class="alumni-card">
+                <div class="card-content">
+                    <div class="alumni-photo">
+                        {% if person.profile_photo %}
+                        <img src="{{ url_for('static', filename=person.profile_photo) }}" alt="{{ person.first_name }}">
+                        {% else %}
+                        <span class="photo-placeholder">{{ person.first_name[0] if person.first_name else 'A' }}{{
+                            person.last_name[0] if person.last_name else '' }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="alumni-info">
+                        <h3 class="alumni-name">
+                            <a href="{{ url_for('alumni_profile', profile_id=person.id) }}">{{ person.first_name }} {{
+                                person.last_name }}</a>
+                        </h3>
+                        {% if person.current_job_title %}
+                        <p class="alumni-title">{{ person.current_job_title }}</p>
+                        {% endif %}
+                        {% if person.current_company %}
+                        <p class="alumni-company">{{ person.current_company }}</p>
+                        {% endif %}
+                        <div class="alumni-meta">
+                            {% if person.degree_name %}
+                            <span>🎓 {{ person.degree_name }}</span>
+                            {% endif %}
+                            {% if person.graduation_year %}
+                            <span>📅 {{ person.graduation_year }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 0 1.5rem 1.5rem; text-align: right;">
+                    <a href="{{ url_for('alumni_profile', profile_id=person.id) }}" class="btn btn-outline btn-sm">View
+                        Profile</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="no-results">
+                <p>No alumni found matching your criteria.</p>
+                {% if search or skill %}
+                <a href="{{ url_for('alumni_directory') }}" class="btn btn-outline">Clear Filters</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}{{ alumni.first_name }} {{ alumni.last_name }} - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="profile-header">
+    <div class="container">
+        <a href="{{ url_for('alumni_directory') }}" class="back-link">← Back to Directory</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="profile-layout">
+            <div class="profile-sidebar">
+                <div class="profile-card">
+                    <div class="profile-photo-large">
+                        {% if alumni.profile_photo %}
+                        <img src="{{ url_for('static', filename=alumni.profile_photo) }}" alt="{{ alumni.first_name }}">
+                        {% else %}
+                        <span class="photo-placeholder-large">{{ alumni.first_name[0] if alumni.first_name else 'A' }}{{
+                            alumni.last_name[0] if alumni.last_name else '' }}</span>
+                        {% endif %}
+                    </div>
+                    <h1 class="profile-name">{{ alumni.first_name }} {{ alumni.last_name }}</h1>
+                    {% if alumni.current_job_title %}
+                    <p class="profile-title">{{ alumni.current_job_title }}</p>
+                    {% endif %}
+                    {% if alumni.current_company %}
+                    <p class="profile-company">at {{ alumni.current_company }}</p>
+                    {% endif %}
+
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <span class="stat-number">{{ alumni.profile_views or 0 }}</span>
+                            <span class="stat-label">Views</span>
+                        </div>
+                    </div>
+
+                    <div class="profile-links">
+                        {% if alumni.linkedin_url %}
+                        <a href="{{ alumni.linkedin_url }}" class="btn btn-outline btn-sm" target="_blank">LinkedIn</a>
+                        {% endif %}
+                        {% if alumni.website %}
+                        <a href="{{ alumni.website }}" class="btn btn-outline btn-sm" target="_blank">Website</a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="profile-section"
+                        style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                        <h4
+                            style="font-size: 0.875rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                            Contact Information</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            {% if alumni.email %}
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                                <span style="color: var(--text-muted);">📧</span>
+                                <a href="mailto:{{ alumni.email }}"
+                                    style="color: var(--primary-color); text-decoration: none;">{{ alumni.email }}</a>
+                            </div>
+                            {% endif %}
+                            {% if alumni.show_phone and alumni.phone %}
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                                <span style="color: var(--text-muted);">📱</span>
+                                <span style="color: var(--text-main);">{{ alumni.phone }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Send Message Button -->
+                    {% if session.get('user_id') and session.get('user_id') != alumni.user_id %}
+                    <div class="profile-section"
+                        style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                        <a href="{{ url_for('compose_message', recipient_id=alumni.user_id) }}" class="btn btn-primary"
+                            style="width: 100%; text-align: center; display: block;">Send Message</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-main" style="background: transparent; padding: 0; box-shadow: none;">
+                <!-- About -->
+                {% if alumni.bio %}
+                <div class="profile-content-card">
+                    <h3>About</h3>
+                    <p>{{ alumni.bio }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Education -->
+                <div class="profile-content-card">
+                    <h3>Education</h3>
+                    <div class="education-item">
+                        <strong style="color: var(--text-main);">{{ alumni.degree_name or 'Degree not specified'
+                            }}</strong>
+                        <p>{{ alumni.campus_name or 'Campus not specified' }}</p>
+                        {% if alumni.graduation_year %}
+                        <p class="year">Class of {{ alumni.graduation_year }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                {% if skills %}
+                <div class="profile-content-card">
+                    <h3>Skills</h3>
+                    <div class="skills-list">
+                        {% for skill in skills %}
+                        <div class="skill-item" style="border-color: var(--dark-border);">
+                            <span class="skill-name" style="color: var(--text-main);">{{ skill.skill_name }}</span>
+                            <span class="skill-level badge badge-{{ skill.proficiency_level }}">{{
+                                skill.proficiency_level }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Work History -->
+                {% if work_history %}
+                <div class="profile-content-card">
+                    <h3>Work Experience</h3>
+                    <div class="work-timeline" style="border-color: var(--dark-border);">
+                        {% for work in work_history %}
+                        <div class="work-item {% if work.is_current %}current{% endif %}">
+                            <div class="work-header">
+                                <h4 style="color: var(--text-main);">{{ work.job_title }}</h4>
+                                {% if work.is_current %}
+                                <span class="badge badge-success">Current</span>
+                                {% endif %}
+                            </div>
+                            <p class="work-company" style="color: var(--gray-400);">{{ work.company_name }}</p>
+                            <p class="work-dates" style="color: var(--gray-500);">
+                                {{ work.start_date | format_date('%b %Y') if work.start_date else '' }} -
+                                {{ work.end_date | format_date('%b %Y') if work.end_date and not work.is_current else
+                                'Present' }}
+                            </p>
+                            {% if work.description %}
+                            <p class="work-description" style="color: var(--gray-300);">{{ work.description }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

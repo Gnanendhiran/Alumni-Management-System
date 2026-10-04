@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} - Alumni Sync{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <a href="{{ url_for('jobs') }}" class="back-link">← Back to Jobs</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="job-detail-layout">
+            <div class="job-detail-main">
+                {% if is_poster %}
+                <div class="job-detail-section">
+                    <h3 class="table-section-title">👥 Applicants ({{ applicants|length }})</h3>
+                    {% if applicants %}
+                    <div class="applicants-list">
+                        <table style="width:100%; border-collapse: collapse; margin-bottom: 2rem;">
+                            <thead>
+                                <tr>
+                                    <th style="padding:10px; text-align:left;">Name</th>
+                                    <th style="padding:10px; text-align:left;">Email</th>
+                                    <th style="padding:10px; text-align:left;">Applied On</th>
+                                    <th style="padding:10px; text-align:left;">CV</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applicants %}
+                                <tr style="border-bottom:1px solid var(--gray-200);">
+                                    <td style="padding:10px;">
+                                        {% if app.profile_id and app.profile_type %}
+                                        <a href="{% if app.profile_type == 'alumni' %}{{ url_for('alumni_profile', profile_id=app.profile_id) }}{% else %}{{ url_for('student_profile', profile_id=app.profile_id) }}{% endif %}"
+                                            style="color: var(--primary-color); text-decoration: none; font-weight: 500;">
+                                            {{ app.first_name }} {{ app.last_name }}
+                                        </a>
+                                        {% else %}
+                                        {{ app.first_name }} {{ app.last_name }}
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding:10px;"><a href="mailto:{{ app.email }}">{{ app.email }}</a></td>
+                                    <td style="padding:10px;">{{ app.applied_at | format_date('%b %d, %Y') }}</td>
+                                    <td style="padding:10px;">
+                                        {% if app.cv_upload %}
+                                        <a href="{{ url_for('download_cv', application_id=app.id) }}"
+                                            class="btn btn-outline btn-sm">📄 Download CV</a>
+                                        {% else %}
+                                        <span style="color:var(--gray-500);font-size:0.875rem;">No CV</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p style="color:var(--gray-600); font-style:italic;">No applications received yet.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="job-detail-header">
+                    <h1>{{ job.title }}</h1>
+                    <div>
+                        <span class="badge badge-{{ job.job_type }} badge-lg">{{ job.job_type.replace('_', ' ').title()
+                            }}</span>
+                        {% if job.target_audience == 'alumni_only' %}
+                        <span class="badge badge-alumni badge-lg">👔 Alumni Only</span>
+                        {% elif job.target_audience == 'students_only' %}
+                        <span class="badge badge-students badge-lg">🎓 Students Only</span>
+                        {% else %}
+                        <span class="badge badge-all badge-lg">🌐 Open to All</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="job-detail-company">
+                    <h2>{{ job.company_name }}</h2>
+                    <p class="job-location">📍 {{ job.location or 'Remote' }}</p>
+                </div>
+
+                <div class="job-detail-meta">
+                    {% if job.salary_min and job.salary_max %}
+                    <div class="meta-item">
+                        <strong>Salary:</strong> {{ job.salary_currency or 'BDT' }} {{ job.salary_min|int }} - {{
+                        job.salary_max|int }}
+                    </div>
+                    {% endif %}
+                    {% if job.application_deadline %}
+                    <div class="meta-item">
+                        <strong>Deadline:</strong> {{ job.application_deadline | format_date('%B %d, %Y') }}
+                    </div>
+                    {% endif %}
+                    {% if job.vacancies %}
+                    <div class="meta-item">
+                        <strong>Vacancies:</strong> {{ job.vacancies }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="job-detail-section">
+                    <h3>Job Description</h3>
+                    <div class="content">{{ job.description }}</div>
+                </div>
+
+                {% if job.requirements %}
+                <div class="job-detail-section">
+                    <h3>Requirements</h3>
+                    <div class="content">{{ job.requirements }}</div>
+                </div>
+                {% endif %}
+
+                {% if job.responsibilities %}
+                <div class="job-detail-section">
+                    <h3>Responsibilities</h3>
+                    <div class="content">{{ job.responsibilities }}</div>
+                </div>
+                {% endif %}
+
+                {% if skills %}
+                <div class="job-detail-section">
+                    <h3>Required Skills</h3>
+                    <div class="skills-tags">
+                        {% for skill in skills %}
+                        <span class="skill-tag">{{ skill.skill_name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="job-detail-sidebar">
+                <div class="sidebar-card">
+                    <h4>Posted By</h4>
+                    <p class="poster-name">{{ job.poster_name or 'Anonymous' }}</p>
+                    <p class="poster-email">{{ job.poster_email }}</p>
+                </div>
+
+                <div class="sidebar-card">
+                    <h4>Apply for this Position</h4>
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-primary btn-block">Apply Now</a>
+                    {% else %}
+                    <p class="note">Please <a href="{{ url_for('login') }}">login</a> to apply.</p>
+                    {% endif %}
+
+                    {% if job.application_email %}
+                    <p class="or-divider">Or email directly:</p>
+                    <a href="mailto:{{ job.application_email }}" class="btn btn-outline btn-block">{{
+                        job.application_email }}</a>
+                    {% endif %}
+                </div>
+
+                <div class="sidebar-card">
+                    <h4>Job Stats</h4>
+                    <p>👁️ {{ job.views_count or 0 }} views</p>
+                    <p>📝 {{ job.applications_count or 0 }} applications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
